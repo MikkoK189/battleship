@@ -1,10 +1,14 @@
+const board = [];
+
 function GameBoard() {
   return {
-    board: [],
+    getBoard() {
+      return board;
+    },
     buildBoard() {
       for (let x = 0; x < 10; x++) {
         for (let y = 0; y < 10; y++) {
-          this.board.push({
+          board.push({
             coord: `${x} ${y}`,
             occupied: false,
           });
@@ -13,31 +17,16 @@ function GameBoard() {
     },
     placeShip(x, y, ship, flipped) {
       let coordOccupied = false;
-      let coord = this.board.find(
-        (boardSquare) => boardSquare.coord == `${x} ${y}`
-      );
+      let coord = findCoordinate(x, y);
 
-      if (!coord.occupied) {
-        for (let i = 1; i <= ship.length; i++) {
-          if (!flipped) {
-            if (!coord.occupied) {
-              coord = this.board.find(
-                (boardSquare) => boardSquare.coord == `${x + i} ${y}`
-              );
-            } else {
-              coordOccupied = true;
-              return;
-            }
-          } else {
-            if (!coord.occupied) {
-              coord = this.board.find(
-                (boardSquare) => boardSquare.coord == `${x} ${y + i}`
-              );
-            } else {
-              coordOccupied = true;
-              return;
-            }
-          }
+      for (let i = 1; i <= ship.length; i++) {
+        if (!coord.occupied) {
+          const newX = flipped ? x + i : x;
+          const newY = flipped ? y : y + i;
+          coord = findCoordinate(newX, newY);
+        } else {
+          coordOccupied = true;
+          return;
         }
       }
 
@@ -45,27 +34,28 @@ function GameBoard() {
         console.error("Can't place ship on top of another one");
         return;
       } else {
-        coord = this.board.find(
-          (boardSquare) => boardSquare.coord == `${x} ${y}`
-        );
+        coord = findCoordinate(x, y);
         for (let i = 1; i <= ship.length; i++) {
-          if (!flipped) {
-            coord.occupied = true;
-            coord.ship = ship;
-            coord = this.board.find(
-              (boardSquare) => boardSquare.coord == `${x + i} ${y}`
-            );
-          } else {
-            coord.occupied = true;
-            coord.ship = ship;
-            coord = this.board.find(
-              (boardSquare) => boardSquare.coord == `${x} ${y + i}`
-            );
-          }
+          setOccupied(coord, ship);
+          const newX = flipped ? x + i : x;
+          const newY = flipped ? y : y + i;
+          coord = findCoordinate(newX, newY);
         }
       }
     },
   };
+}
+
+function findCoordinate(x, y) {
+  const coordToReturn = board.find(
+    (boardSquare) => boardSquare.coord == `${x} ${y}`
+  );
+  return coordToReturn;
+}
+
+function setOccupied(coord, ship) {
+  coord.occupied = true;
+  coord.ship = ship;
 }
 
 module.exports = GameBoard;
