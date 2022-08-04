@@ -1,11 +1,11 @@
 const GameBoard = require("./gameboard");
 const Ship = require("./ship");
 
-const testBoard = GameBoard();
+const testBoard = new GameBoard();
 testBoard.buildBoard();
 
 it("board exists", () => {
-  expect(testBoard.board);
+  expect(testBoard.board.length).toBeGreaterThan(0);
 });
 
 it("can place ships on the board", () => {
